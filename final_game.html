@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Final Paper Clip Clicker Game with Balanced Economy">
+    <title>Final Paper Clip Clicker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+            width: 500px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .game-state-indicator {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .state-normal {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .state-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .state-critical {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .resources-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .resource-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card.low {
+            border-color: #e74c3c;
+        }
+
+        .resource-card.high {
+            border-color: #27ae60;
+        }
+
+        .resource-name {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .resource-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .resource-progress {
+            margin-top: 10px;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #27ae60;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.warning {
+            background-color: #f39c12;
+        }
+
+        .progress-bar.critical {
+            background-color: #e74c3c;
+        }
+
+        .click-area {
+            background-color: #3498db;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .click-area:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .click-area:active {
+            background-color: #1f618d;
+            transform: translateY(0);
+        }
+
+        .click-animation {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 1s ease-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-button {
+            background-color: #3498db;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .control-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(52, 152, 219, 0.2);
+        }
+
+        .control-button:active {
+            background-color: #1f618d;
+            transform: translateY(0);
+        }
+
+        .control-button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .price-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .autoclipper-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .autoclipper-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .autowire-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .autowire-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .price-control input {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .price-control button {
+            background-color: #2ecc71;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .price-control button:hover {
+            background-color: #27ae60;
+        }
+
+        .demand-display {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .high-demand {
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .low-demand {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .no-demand {
+            color: #95a5a6;
+            border-color: #95a5a6;
+        }
+
+        .trust-upgrade-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .trust-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .price-lock-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .price-lock-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .price-range-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .price-range-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .clicker-upgrade-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .clicker-upgrade-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .sell-speed-section {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .sell-speed-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .stats-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .feedback-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translate(-50%, -30px);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .feedback-message.success {
+            background-color: #27ae60;
+        }
+
+        .feedback-message.error {
+            background-color: #e74c3c;
+        }
+
+        .feedback-message.warning {
+            background-color: #f39c12;
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Final Paper Clip Clicker</h1>
+            <div class="game-state-indicator" id="game-state">Normal</div>
+        </div>
+
+        <div class="resources-section">
+            <div class="resources-grid">
+                <div class="resource-card" id="wire-card">
+                    <div class="resource-name">Wire</div>
+                    <div class="resource-value" id="wire-display">100</div>
+                    <div class="resource-progress">
+                        <div class="progress-bar" id="wire-progress"></div>
+                    </div>
+                </div>
+                <div class="resource-card" id="paperclip-card">
+                    <div class="resource-name">Paper Clips</div>
+                    <div class="resource-value" id="paperclip-display">0</div>
+                    <div class="resource-progress">
+                        <div class="progress-bar" id="paperclip-progress"></div>
+                    </div>
+                </div>
+                <div class="resource-card" id="money-card">
+                    <div class="resource-name">Money</div>  
+                    <div class="resource-value" id="money-display">$100.00</div>
+                    <div class="resource-progress">
+                        <div class="progress-bar" id="money-progress"></div>
+                    </div>
+                </div>
+                <div class="resource-card" id="demand-card">
+                    <div class="resource-name">Demand</div>
+                    <div class="resource-value" id="demand-value">High</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="click-area" id="produce-button">
+            Click to Make Paper Clip
+        </div>
+
+        <div class="controls-section">
+            <button class="control-button" id="buy-wire-button">Buy Wire ($1.00)</button>
+            <button class="control-button" id="sell-paperclips-button">Sell Paper Clips</button>
+        </div>
+
+        <div class="autoclipper-section">
+            <div class="autoclipper-info">
+                <span>Autoclippers: <span id="autoclipper-count">0</span></span>
+                <span>Production: <span id="autoclipper-production">0</span> clips/sec</span>
+            </div>
+            <button class="control-button" id="buy-autoclipper-button">Buy Autoclipper ($50.00)</button>
+        </div>
+
+        <div class="autowire-section">
+            <div class="autowire-info">
+                <span>Autowires: <span id="autowire-count">0</span></span>
+                <span>Status: <span id="autowire-status">Inactive</span></span>
+            </div>
+            <button class="control-button" id="buy-autowire-button">Buy Autowire ($150.00)</button>
+        </div>
+
+        <div class="price-control">
+            <label for="price-input">Price: $</label>
+            <input type="number" id="price-input" step="0.01" min="0.01">
+            <button id="set-price-button">Set Price</button>
+        </div>
+
+        <div class="trust-upgrade-section">
+            <button class="control-button" id="trust-upgrade-button">Upgrade Trust ($1000)</button>
+            <div class="trust-info">Trust Level: <span id="trust-level">1</span></div>
+        </div>
+
+        <div class="price-lock-section">
+            <button class="control-button" id="price-lock-button">Lock Prices ($5000)</button>
+            <div class="price-lock-info">Price Lock: <span id="price-lock-status">Unlocked</span></div>
+        </div>
+
+        <div class="price-range-section">
+            <button class="control-button" id="price-range-button">Upgrade Price Range ($10000)</button>
+            <div class="price-range-info">Price Range: <span id="price-range-level">Normal ($0-$10)</span></div>
+        </div>
+
+        <div class="clicker-upgrade-section">
+            <button class="control-button" id="clicker-upgrade-button">Upgrade Clicker ($500)</button>
+            <div class="clicker-upgrade-info">Clicker Level: <span id="clicker-level">1 clip/click</span></div>
+        </div>
+
+        <div class="sell-speed-section">
+            <button class="control-button" id="sell-speed-button">Double Sell Speed ($100)</button>
+            <div class="sell-speed-info">Sell Speed: <span id="sell-speed-multiplier">1x</span></div>
+        </div>
+
+        <div class="demand-display" id="demand-display">
+            Demand Level: <span id="demand-level">High (150%)</span>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-item">Total Clicks: <span id="total-clicks">0</span></div>
+            <div class="stat-item">Total Paper Clips: <span id="total-paperclips">0</span></div>
+            <div class="stat-item">Total Wire Used: <span id="total-wire">0</span></div>
+            <div class="stat-item">Wire Depletion: <span id="depletion-status">Active</span></div>
+        </div>
+    </div>
+
+    <script src="final_game.js"></script>
+</body>
+</html>

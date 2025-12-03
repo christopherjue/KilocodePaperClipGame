@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Paper Clip Clicker Game">
+    <title>Paper Clip Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Paper Clip Clicker</h1>
+        </header>
+
+        <main>
+            <section class="resources">
+                <div class="resource wire">
+                    <h2>Wire</h2>
+                    <div class="resource-display" id="wire-display">0</div>
+                </div>
+            </section>
+
+            <section class="production">
+                <button class="production-button" id="produce-button">
+                    <span class="button-icon">🖇️</span>
+                    <span class="button-text">Make Paper Clip</span>
+                </button>
+            </section>
+
+            <section class="inventory">
+                <div class="inventory-item">
+                    <h2>Paper Clips</h2>
+                    <div class="inventory-display" id="paperclip-display">0</div>
+                </div>
+                <div class="price-control">
+                    <label for="price-input">Price per clip: $</label>
+                    <input type="number" id="price-input" value="0.50" step="0.01" min="0.01">
+                    <button id="set-price-button">Set Price</button>
+                    <div id="demand-display">Demand: High</div>
+                </div>
+            </section>
+
+            <section class="currency">
+                <div class="money-display">
+                    <h2>Money</h2>
+                    <div class="currency-display" id="money-display">$0.00</div>
+                </div>
+            </section>
+
+            <section class="purchases">
+                <button class="purchase-button" id="buy-wire-button">
+                    <span class="button-text">Buy Wire ($1.00 for 100 units)</span>
+                </button>
+                <button class="purchase-button" id="sell-paperclips-button">
+                    <span class="button-text">Sell Paper Clips</span>
+                </button>
+            </section>
+
+            <section class="statistics">
+                <h2>Game Statistics</h2>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Clicks:</span>
+                        <span class="stat-value" id="total-clicks">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Paper Clips Made:</span>
+                        <span class="stat-value" id="total-paperclips">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Wire Purchased:</span>
+                        <span class="stat-value" id="total-wire">0</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
